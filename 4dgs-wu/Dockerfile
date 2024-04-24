@@ -49,6 +49,7 @@ RUN apt install -y \
     -DCMAKE_CXX_COMPILER=g++-10 \
     -DCMAKE_C_COMPILER=gcc-10 && \
     ninja && ninja install && \
+    cd ../.. && \
     rm -rf colmap
 
 
