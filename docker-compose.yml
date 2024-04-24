@@ -1,0 +1,28 @@
+version: "3"
+
+x-base: &base
+  tty: true
+  stdin_open: true
+  working_dir: /mnt
+
+  deploy:
+    resources:
+      reservations:
+        devices:
+          - capabilities: [gpu]
+
+services:
+  4dgs-wu:
+    <<: *base
+    command: ./run.sh
+    build: ./4dgs-wu
+    volumes:
+      - ./4dgs-wu:/mnt
+    working_dir: ./4dgs-wu
+  tailscale:
+    image: tailscale/tailscale
+    hostname: tailscale
+
+secrets:
+  tailscale-authkey:
+    file: ./secrets/tailscale
