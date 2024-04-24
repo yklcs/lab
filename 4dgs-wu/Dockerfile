@@ -15,7 +15,7 @@ RUN apt update && apt upgrade -y && \
 # python
 
 RUN apt install -y \
-    $PYTHON $PYTHON-venv && \
+    $PYTHON "$PYTHON-venv" && \
     $PYTHON -m venv $VENV
 
 
