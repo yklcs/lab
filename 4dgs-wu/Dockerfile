@@ -54,7 +54,7 @@ RUN apt install -y \
 
 # 4dgs-wu
 
-RUN cd 4DGaussians && \
+RUN cd 4dgs-wu && \
     . $VENV/bin/activate && \
     $PYTHON -m pip install -r requirements.txt && \
     $PYTHON -m pip install -e submodules/depth-diff-gaussian-rasterization \
