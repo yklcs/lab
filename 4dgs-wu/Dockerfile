@@ -9,7 +9,7 @@ ENV VENV=/venv
 
 
 RUN apt update && apt upgrade -y && \
-    apt install git curl build-essential
+    apt install -y git curl build-essential
 
 
 # python
