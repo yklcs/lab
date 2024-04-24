@@ -1,9 +1,9 @@
 ARG CUDA_IMAGE_TAG=11.8.0-cudnn8-devel-ubuntu22.04
-ARG PYTHON=python3.10
-ARG DEBIAN_FRONTEND=noninteractive
-
 FROM nvidia/cuda:$CUDA_IMAGE_TAG
 
+
+ARG PYTHON=python3.10
+ARG DEBIAN_FRONTEND=noninteractive
 
 ENV VENV=/venv
 
