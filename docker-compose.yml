@@ -1,10 +1,12 @@
 version: "3"
 
 x-base: &base
+  command: /lab/_scripts/run.sh
   tty: true
   stdin_open: true
-  working_dir: /mnt
-
+  working_dir: /lab
+  volumes:
+    - .:/lab
   deploy:
     resources:
       reservations:
@@ -14,8 +16,7 @@ x-base: &base
 services:
   4dgs-wu:
     <<: *base
-    command: ./run.sh
     build: ./4dgs-wu
-    volumes:
-      - ./4dgs-wu:/mnt
-    working_dir: ./4dgs-wu
+    working_dir: /lab/4dgs-wu
+    environment:
+      WORKDIR: /lab/4dgs-wu

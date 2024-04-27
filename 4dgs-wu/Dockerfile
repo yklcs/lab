@@ -1,5 +1,5 @@
-ARG CUDA_IMAGE_TAG=11.8.0-cudnn8-devel-ubuntu22.04
-FROM nvidia/cuda:$CUDA_IMAGE_TAG
+ARG CUDA_IMAGE_TAG=11.7.1-cudnn8-devel-ubuntu22.04
+FROM nvcr.io/nvidia/cuda:$CUDA_IMAGE_TAG
 
 
 ARG PYTHON=python3.10
@@ -9,14 +9,7 @@ ENV VENV=/venv
 
 
 RUN apt update && apt upgrade -y && \
-    apt install -y git curl build-essential
-
-
-# python
-
-RUN apt install -y \
-    $PYTHON "$PYTHON-venv" && \
-    $PYTHON -m venv $VENV
+    apt install -y git curl unzip build-essential
 
 
 # colmap
@@ -39,27 +32,31 @@ RUN apt install -y \
     qtbase5-dev \
     libqt5opengl5-dev \
     libcgal-dev \
-    libceres-dev \
-    gcc-10 \
-    g++-10 && \
+    libceres-dev && \
     git clone https://github.com/colmap/colmap.git && \
     cd colmap && mkdir build && cd build && \
-    cmake .. -GNinja -DCMAKE_CUDA_ARCHITECTURES=86 \
-    -DCMAKE_CUDA_HOST_COMPILER=g++-10 \
-    -DCMAKE_CXX_COMPILER=g++-10 \
-    -DCMAKE_C_COMPILER=gcc-10 && \
+    cmake .. -GNinja -DCMAKE_CUDA_ARCHITECTURES=native && \
     ninja && ninja install && \
     cd ../.. && \
     rm -rf colmap
 
 
+# python
+
+RUN apt install -y \
+    $PYTHON "$PYTHON-venv" "$PYTHON-dev" && \
+    $PYTHON -m venv $VENV
+
+
 # 4dgs-wu
 
-RUN cd 4dgs-wu && \
+
+COPY 4dgs-wu $WORKDIR
+
+
+RUN cd $WORKDIR && \
     . $VENV/bin/activate && \
-    $PYTHON -m pip install -r requirements.txt && \
-    $PYTHON -m pip install -e submodules/depth-diff-gaussian-rasterization \
-    $PYTHON -m pip install -e submodules/simple-knn
+    $PYTHON -m pip install -r requirements.txt
 
 
 ENTRYPOINT [ "/bin/sh", "-c" ]
