@@ -2,6 +2,7 @@ ARG CUDA_IMAGE_TAG=11.7.1-cudnn8-devel-ubuntu22.04
 FROM nvcr.io/nvidia/cuda:$CUDA_IMAGE_TAG
 
 
+ARG COLMAP_BRANCH=main
 ARG PYTHON=python3.10
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -32,10 +33,11 @@ RUN apt install -y \
     qtbase5-dev \
     libqt5opengl5-dev \
     libcgal-dev \
-    libceres-dev && \
-    git clone https://github.com/colmap/colmap.git && \
+    libceres-dev
+
+RUN git clone https://github.com/colmap/colmap.git --branch $COLMAP_BRANCH && \
     cd colmap && mkdir build && cd build && \
-    cmake .. -GNinja -DCMAKE_CUDA_ARCHITECTURES=native && \
+    cmake .. -GNinja -DCMAKE_CUDA_ARCHITECTURES="$CUDA_ARCHITECTURES" && \
     ninja && ninja install && \
     cd ../.. && \
     rm -rf colmap
@@ -50,11 +52,10 @@ RUN apt install -y \
 
 # 4dgs-wu
 
+COPY 4dgs-wu /lab/4dgs-wu/4dgs-wu
 
-COPY 4dgs-wu $WORKDIR
 
-
-RUN cd $WORKDIR && \
+RUN cd /lab/4dgs-wu/4dgs-wu && \
     . $VENV/bin/activate && \
     $PYTHON -m pip install -r requirements.txt
 

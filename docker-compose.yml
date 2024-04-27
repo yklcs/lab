@@ -12,11 +12,16 @@ x-base: &base
       reservations:
         devices:
           - capabilities: [gpu]
+  env_file:
+    - path: ./default.env
+      required: true
+    - path: ./.env
+      required: false
 
 services:
   4dgs-wu:
     <<: *base
-    build: ./4dgs-wu
-    working_dir: /lab/4dgs-wu
-    environment:
-      WORKDIR: /lab/4dgs-wu
+    build:
+      context: ./4dgs-wu
+      args:
+        COLMAP_BRANCH: "3.8"
