@@ -24,4 +24,4 @@ services:
     build:
       context: ./4dgs-wu
       args:
-        COLMAP_BRANCH: "3.8"
+        COLMAP_BRANCH: main
