@@ -9,14 +9,19 @@ if [ ! $(lsb_release -si) = "Ubuntu" ]; then
     exit 1
 fi
 
-sudo ubuntu-drivers install --gpgpu
-
 sudo apt update -y
+sudo apt upgrade -y
+
 
 NVIDIA_DRIVER_VERSION=$(nvidia-detector | sed s/nvidia-driver-//)
-sudo apt install -y "nvidia-utils-$NVIDIA_DRIVER_VERSION"
+sudo apt install -y "nvidia-driver-$NVIDIA_DRIVER_VERSION" "nvidia-utils-$NVIDIA_DRIVER_VERSION"
 
-sudo apt install -y ca-certificates curl
+# probably will need to reboot here
+# sudo reboot
+
+
+sudo apt install -y ca-certificates curl git
+
 
 # install nvidia-container-toolkit
 
@@ -26,6 +31,7 @@ curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dear
     sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
 sudo apt-get update
 sudo apt-get install -y nvidia-container-toolkit
+
 
 # install docker
 
@@ -38,3 +44,7 @@ echo \
   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 sudo apt update
 sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo usermod -aG docker $USER
+newgrp docker
+
+git clone https://github.com/yklcs/lab --recursive
