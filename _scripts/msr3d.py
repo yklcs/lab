@@ -36,5 +36,5 @@ if __name__ == "__main__":
             os.mkdir(out / cam_id)
             for img in cam.glob("color-*.jpg"):
                 img_num = int(img.stem.removeprefix(f"color-{cam.name}-f"))
-                renamed = f"frame_{img_num:05d}{img.suffix}"
+                renamed = f"frame_{1+img_num:05d}{img.suffix}"
                 shutil.copyfile(img, out / cam_id / renamed)
