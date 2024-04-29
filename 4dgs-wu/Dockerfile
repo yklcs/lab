@@ -49,7 +49,7 @@ RUN apt install -y \
 
 
 COPY 4dgs-wu 4dgs-wu/4dgs-wu
-RUN cd 4dgs-wu && \
+RUN cd 4dgs-wu/4dgs-wu && \
     . $VENV/bin/activate && \
     pip install -r requirements.txt && \
     pip install scikit-image
@@ -64,4 +64,5 @@ RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
     NODE_OPTIONS=--openssl-legacy-provider jupyter lab build
 
 
+COPY entrypoint.sh .
 ENTRYPOINT [ "entrypoint.sh" ]
