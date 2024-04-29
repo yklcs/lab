@@ -59,7 +59,8 @@ RUN cd /lab/4dgs-wu/4dgs-wu && \
 
 
 # jupyterlab
-RUN . $VENV/bin/activate && \
+RUN apt install -y nodejs npm && \
+    . $VENV/bin/activate && \
     pip install jupyterlab ipykernel && \
     python -m ipykernel install --user --name=venv && \
     NODE_OPTIONS=--openssl-legacy-provider jupyter lab build
