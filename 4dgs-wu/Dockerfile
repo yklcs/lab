@@ -48,10 +48,11 @@ RUN apt install -y \
     $PYTHON -m venv $VENV
 
 
-# 4dgs-wu
+ARG WORKDIR
+WORKDIR $WORKDIR
 
-COPY 4dgs-wu /lab/4dgs-wu/4dgs-wu
-RUN cd /lab/4dgs-wu/4dgs-wu && \
+COPY 4dgs-wu $WORKDIR/4dgs-wu
+RUN cd $WORKDIR/4dgs-wu && \
     . $VENV/bin/activate && \
     pip install -r requirements.txt && \
     pip install scikit-image
