@@ -2,7 +2,14 @@
 
 # https://github.com/lpasselin/tailscale-docker
 
-trap 'tailscale logout && kill -TERM $PID' TERM INT
+cleanup() {
+    until tailscale logout; do
+        sleep 0.1
+    done
+    kill -TERM $PID
+}
+
+trap cleanup TERM INT
 echo "Starting Tailscale daemon"
 tailscaled --tun=userspace-networking --state="$TAILSCALE_STATE_ARG" "$TAILSCALE_OPT" &
 PID=$!
