@@ -1,0 +1,3 @@
+[submodule "4dgs-wu/4dgs-wu"]
+	path = 4dgs-wu/4dgs-wu
+	url = https://github.com/hustvl/4DGaussians
