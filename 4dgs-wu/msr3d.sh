@@ -12,8 +12,8 @@ rm -rf msr3d-raw msr3d.zip
 
 
 if [ $COLMAP_CACHED ]; then
-    cp colmap-out/msr3d-ballet/* 4dgs-wu/data/multipleview/msr3d-ballet
-    cp colmap-out/msr3d-breakdancers/* 4dgs-wu/data/multipleview/msr3d-breakdancers
+    cp -R colmap-out/msr3d-ballet/* 4dgs-wu/data/multipleview/msr3d-ballet
+    cp -R colmap-out/msr3d-breakdancers/* 4dgs-wu/data/multipleview/msr3d-breakdancers
 else
     cd 4dgs-wu
     chmod +x multipleviewprogress.sh
