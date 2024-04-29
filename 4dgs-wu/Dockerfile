@@ -54,8 +54,7 @@ COPY 4dgs-wu /lab/4dgs-wu/4dgs-wu
 RUN cd /lab/4dgs-wu/4dgs-wu && \
     . $VENV/bin/activate && \
     pip install -r requirements.txt && \
-    pip install scikit-image && \
-    pip install jupyterlab ipykernel
+    pip install scikit-image
 
 
 # jupyterlab
