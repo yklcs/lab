@@ -7,6 +7,9 @@ x-base: &base
   working_dir: /lab
   volumes:
     - .:/lab
+  network_mode: "service:tailscale"
+  depends_on:
+    - tailscale
   deploy:
     resources:
       reservations:
@@ -25,3 +28,15 @@ services:
       context: ./4dgs-wu
       args:
         COLMAP_BRANCH: main
+  tailscale:
+    build: ./_services/tailscale
+    secrets:
+      - tailscale
+    environment:
+      TAILSCALE_AUTH_KEY: "file:/run/secrets/tailscale"
+      TAILSCALE_HOSTNAME: labll
+      TAILSCALE_STATE_ARG: "mem:"
+
+secrets:
+  tailscale:
+    file: .secrets/tailscale
