@@ -59,7 +59,8 @@ RUN cd /lab/4dgs-wu/4dgs-wu && \
 
 
 # jupyterlab
-RUN apt install -y nodejs npm && \
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
+    apt install -y nodejs && \
     . $VENV/bin/activate && \
     pip install jupyterlab ipykernel && \
     python -m ipykernel install --user --name=venv && \
