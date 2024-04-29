@@ -54,7 +54,15 @@ COPY 4dgs-wu /lab/4dgs-wu/4dgs-wu
 RUN cd /lab/4dgs-wu/4dgs-wu && \
     . $VENV/bin/activate && \
     pip install -r requirements.txt && \
-    pip install scikit-image jupyterlab
+    pip install scikit-image && \
+    pip install jupyterlab ipykernel
+
+
+# jupyterlab
+RUN . $VENV/bin/activate && \
+    pip install jupyterlab ipykernel && \
+    python -m ipykernel install --user --name=venv && \
+    NODE_OPTIONS=--openssl-legacy-provider jupyter lab build
 
 
 ENTRYPOINT [ "/bin/sh", "-c" ]

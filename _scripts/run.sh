@@ -2,8 +2,10 @@
 
 set -euo pipefail
 
+source $VENV/bin/activate
+
 jupyter lab &
 sleep infinity &
 
-wait -n
+wait
 exit $?
