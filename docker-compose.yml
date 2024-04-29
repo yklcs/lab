@@ -22,6 +22,7 @@ x-base: &base
 services:
   4dgs-wu:
     <<: *base
+    shm_size: 4gb
     build:
       context: ./4dgs-wu
       args:
