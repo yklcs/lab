@@ -67,4 +67,4 @@ RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
     NODE_OPTIONS=--openssl-legacy-provider jupyter lab build
 
 
-ENTRYPOINT [ "/bin/sh", "-c" ]
+ENTRYPOINT [ "entrypoint.sh" ]
