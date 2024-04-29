@@ -2,7 +2,6 @@ version: "3"
 
 x-base: &base
   command: /lab/_scripts/run.sh
-  working_dir: /lab
   volumes:
     - .:/lab
   network_mode: "service:tailscale"
@@ -27,7 +26,7 @@ services:
       context: ./4dgs-wu
       args:
         COLMAP_BRANCH: main
-        WORKDIR: /lab/4dgs-wu
+    working_dir: /lab/4dgs-wu
 
   tailscale:
     build: ./_services/tailscale
