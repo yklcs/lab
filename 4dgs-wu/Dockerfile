@@ -55,14 +55,5 @@ RUN cd 4dgs-wu/4dgs-wu && \
     pip install scikit-image
 
 
-# jupyterlab
-RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
-    apt install -y nodejs && \
-    . $VENV/bin/activate && \
-    pip install jupyterlab ipykernel && \
-    python -m ipykernel install --user --name=venv && \
-    NODE_OPTIONS=--openssl-legacy-provider jupyter lab build
-
-
 COPY entrypoint.sh .
 ENTRYPOINT [ "entrypoint.sh" ]
