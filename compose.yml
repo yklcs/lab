@@ -1,5 +1,3 @@
-version: "3"
-
 x-base: &base
   command: /lab/_scripts/run.sh
   volumes:
@@ -7,6 +5,8 @@ x-base: &base
   network_mode: "service:tailscale"
   depends_on:
     - tailscale
+  stdin_open: true
+  tty: true
   deploy:
     resources:
       reservations:

@@ -48,12 +48,12 @@ RUN apt install -y \
     $PYTHON -m venv $VENV
 
 
-COPY 4dgs-wu 4dgs-wu/4dgs-wu
-RUN cd 4dgs-wu/4dgs-wu && \
+COPY 4dgs-wu 4dgs-wu
+RUN cd 4dgs-wu && \
     . $VENV/bin/activate && \
     pip install -r requirements.txt && \
     pip install scikit-image
 
 
 COPY entrypoint.sh .
-ENTRYPOINT [ "entrypoint.sh" ]
+ENTRYPOINT [ "./entrypoint.sh" ]
