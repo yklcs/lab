@@ -2,9 +2,9 @@ x-base: &base
   command: /lab/_scripts/run.sh
   volumes:
     - .:/lab
-  network_mode: "service:tailscale"
-  depends_on:
-    - tailscale
+  # network_mode: "service:tailscale"
+  # depends_on:
+  #   - tailscale
   stdin_open: true
   tty: true
   deploy:
@@ -27,6 +27,17 @@ services:
       args:
         COLMAP_BRANCH: main
     working_dir: /lab/4dgs-wu
+
+  4dgs-yang:
+    <<: *base
+    shm_size: 512mb
+    build:
+      context: ./4dgs-yang
+      args:
+        SRCDIR: 4dgs-yang
+        COLMAP_BRANCH: main
+        CUDA_IMAGE_TAG: "11.8.0-cudnn8-devel-ubuntu22.04"
+    working_dir: /lab/4dgs-yang
 
   tailscale:
     build: ./_services/tailscale

@@ -2,4 +2,14 @@
 
 Experiments and exploration 🧪
 
-Made reproducible with Docker. `docker compose <experiment>` to get started.
+## Workflow
+
+Experiments are made reproducible with Docker.
+
+```shell
+# build experiment
+$ docker compose build <experiment>
+
+# open shell
+$ docker compose exec <experiment> -- sh
+```
