@@ -1,0 +1,116 @@
+From 991f7b2134df8543ca632d93119d0b90838e3d31 Mon Sep 17 00:00:00 2001
+From: Lucas Yunkyu Lee <lucas@yklcs.com>
+Date: Sun, 26 May 2024 19:46:45 +0900
+Subject: [PATCH] msr3d experiment
+
+---
+ configs/msr3d-ballet.yaml | 59 +++++++++++++++++++++++++++++++++++++++
+ scene/__init__.py         |  3 +-
+ scripts/n3v2blender.py    |  4 +--
+ 3 files changed, 63 insertions(+), 3 deletions(-)
+ create mode 100644 configs/msr3d-ballet.yaml
+
+diff --git a/configs/msr3d-ballet.yaml b/configs/msr3d-ballet.yaml
+new file mode 100644
+index 0000000..1cdd131
+--- /dev/null
++++ b/configs/msr3d-ballet.yaml
+@@ -0,0 +1,59 @@
++gaussian_dim: 4
++time_duration: [0.0, 10.0]
++num_pts: 300_000
++num_pts_ratio: 1.0
++rot_4d: True
++force_sh_3d: False
++batch_size: 4
++exhaust_test: True
++
++ModelParams:
++  sh_degree: 3
++  source_path: "data/msr3d-ballet"
++  model_path: "output/msr3d-ballet"
++  images: "images"
++  resolution: 2
++  white_background: False
++  data_device: "cuda"
++  eval: True
++  extension: ".jpg"
++  num_extra_pts: 0
++  loaded_pth: ""
++  frame_ratio: 1
++  dataloader: True
++
++PipelineParams:
++  convert_SHs_python: False
++  compute_cov3D_python: False
++  debug: False
++  env_map_res: 0
++  env_optimize_until: 1000000000
++  env_optimize_from: 0
++  eval_shfs_4d: True
++
++OptimizationParams:
++  iterations: 30_000
++  position_lr_init: 0.00016
++  position_t_lr_init: -1.0
++  position_lr_final: 0.0000016
++  position_lr_delay_mult: 0.01
++  position_lr_max_steps: 30_000
++  feature_lr: 0.0025
++  opacity_lr: 0.05
++  scaling_lr: 0.005
++  rotation_lr: 0.001
++  percent_dense: 0.01
++  lambda_dssim: 0.2
++  thresh_opa_prune: 0.005
++  densification_interval: 100
++  opacity_reset_interval: 3000
++  densify_from_iter: 500
++  densify_until_iter: 15_000
++  densify_grad_threshold: 0.0002
++  densify_grad_t_threshold: 0.0002 / 40
++  densify_until_num_points: -1
++  final_prune_from_iter: -1
++  sh_increase_interval: 1000
++  lambda_opa_mask: 0.0
++  lambda_rigid: 0.0
++  lambda_motion: 0.0
+diff --git a/scene/__init__.py b/scene/__init__.py
+index ccb10a5..d78b78e 100644
+--- a/scene/__init__.py
++++ b/scene/__init__.py
+@@ -78,7 +78,8 @@ class Scene:
+             self.test_cameras[resolution_scale] = cameraList_from_camInfos(scene_info.test_cameras, resolution_scale, args)
+             
+         if args.loaded_pth:
+-            self.gaussians.create_from_pth(args.loaded_pth, self.cameras_extent)
++            # self.gaussians.create_from_pth(args.loaded_pth, self.cameras_extent)
++            self.gaussians.restore(model_args=torch.load(args.loaded_pth)[0], training_args=None)
+         else:
+             if self.loaded_iter:
+                 self.gaussians.load_ply(os.path.join(self.model_path,
+diff --git a/scripts/n3v2blender.py b/scripts/n3v2blender.py
+index c3d0446..c010a62 100644
+--- a/scripts/n3v2blender.py
++++ b/scripts/n3v2blender.py
+@@ -301,7 +301,7 @@ if __name__ == '__main__':
+         cam_frames = [{'file_path': im.lstrip("/").split('.')[0], 
+                        'transform_matrix': poses[i].tolist(),
+                        'time': int(im.lstrip("/").split('.')[0][-4:]) / 30.} for im in images if cams[i] in im]
+-        if i == 0:
++        if i == N // 2: # middle camera
+             test_frames += cam_frames
+         else:
+             train_frames += cam_frames
+@@ -343,7 +343,7 @@ if __name__ == '__main__':
+         f.write(f'1 PINHOLE {W} {H} {fx} {fy} {cx} {cy}')
+         for frame in train_frames:
+             if frame['time'] == 0:
+-                fname = frame['file_path'].split('/')[-1] + '.png'
++                fname = frame['file_path'].split('/')[-1] + '.jpg'
+                 pose = np.array(frame['transform_matrix']) @ blender2opencv
+                 fname2pose.update({fname: pose})
+                 
+-- 
+2.45.1
+
