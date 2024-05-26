@@ -1,0 +1,124 @@
+From 081515b353027712db0d73a10d112e204232559c Mon Sep 17 00:00:00 2001
+From: Lucas Yunkyu Lee <lucas@yklcs.com>
+Date: Sun, 26 May 2024 19:34:45 +0900
+Subject: [PATCH] add msr3d interpolation
+
+---
+ .gitignore |  4 +++
+ msr3d.py   | 93 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 97 insertions(+)
+ create mode 100644 .gitignore
+ create mode 100644 msr3d.py
+
+diff --git a/.gitignore b/.gitignore
+new file mode 100644
+index 0000000..f2a33ea
+--- /dev/null
++++ b/.gitignore
+@@ -0,0 +1,4 @@
++ckpt/
++msr3d-*/
++__pycache__/
++msr3d.zip
+diff --git a/msr3d.py b/msr3d.py
+new file mode 100644
+index 0000000..38a484a
+--- /dev/null
++++ b/msr3d.py
+@@ -0,0 +1,93 @@
++import os
++import subprocess
++from pathlib import Path
++import shutil
++
++import imageio.v3 as iio
++import torch
++import numpy as np
++
++
++import config as cfg
++from Trainer import Model
++
++
++ZIP = Path("msr3d.zip")
++RAW = Path("msr3d-raw")
++URL = "https://download.microsoft.com/download/6/F/B/6FBC4A82-443A-44F2-99F1-835F2C2E4379/3DVideos-distrib.zip"
++RAW_BALLET = RAW / "MSR3DVideo-Ballet"
++RAW_BREAKDANCERS = RAW / "MSR3DVideo-Breakdancers"
++OUT_BALLET = Path("msr3d-ballet")
++OUT_BREAKDANCERS = Path("msr3d-breakdancers")
++CKPT_DIR = Path("ckpt")
++CKPT_URLS = {
++    "ours_t.pkl": "https://drive.usercontent.google.com/download?id=1mL4ht5DYFMA1CYiGDFbej-ufh5QoqfwN&export=download&authuser=0&confirm=t&uuid=2e763f78-7ff8-45cd-aba3-44bcd0bb0bee&at=APZUnTWwG221uIUGNGiKpfQRenEm:1716704203446",
++    "ours.pkl": "https://drive.usercontent.google.com/download?id=1XCNoyhA1RX3m8W-XJK8H8inH47l36kxP&export=download&authuser=0&confirm=t&uuid=89bf22d7-5334-46b4-9a78-b5bebd5b226f&at=APZUnTVTyqRiUMqVt6dRIW9QJyhJ:1716705555085",
++}
++NX = 4
++
++cfg.MODEL_CONFIG["LOGNAME"] = "ours_t"
++cfg.MODEL_CONFIG["MODEL_ARCH"] = cfg.init_model_config(F=32, depth=[2, 2, 2, 4, 4])
++
++
++def sh(cmd, *args, **kwargs):
++    kwargs["check"] = True
++    return subprocess.run(cmd, *args, **kwargs)
++
++
++if __name__ == "__main__":
++    if not os.path.exists(CKPT_DIR):
++        os.makedirs(CKPT_DIR)
++    for path, url in CKPT_URLS.items():
++        if not os.path.exists(CKPT_DIR / path):
++            sh(["curl", "-qLo", CKPT_DIR / path, url])
++
++    model = Model(-1)
++    model.load_model()
++    model.eval()
++    model.device()
++
++    if not os.path.exists(ZIP):
++        sh(["curl", "-qo", ZIP, URL])
++
++    if not os.path.exists(RAW):
++        ZIP_INNER = "3DVideos-distrib"
++        sh(["unzip", "-q", ZIP, "-d", RAW])
++        shutil.copytree(RAW / ZIP_INNER, RAW, dirs_exist_ok=True)
++        shutil.rmtree(RAW / ZIP_INNER)
++
++    for scene, out in [(RAW_BREAKDANCERS, OUT_BREAKDANCERS), (RAW_BALLET, OUT_BALLET)]:
++        for cam in scene.glob("cam*"):
++            cam_num = int(cam.name.removeprefix("cam"))
++            cam_id = f"cam{1+cam_num:02d}"
++            os.makedirs(out / cam_id, exist_ok=True)
++
++            for i, (in0, in1) in enumerate(zip(*[cam.glob("color-*.jpg")] * 2)):
++                img0_np = iio.imread(in0)
++                img1_np = iio.imread(in1)
++
++                img0 = (
++                    torch.tensor(img0_np.transpose(2, 0, 1)).cuda() / 255.0
++                ).unsqueeze(0)
++                img1 = (
++                    torch.tensor(img1_np.transpose(2, 0, 1)).cuda() / 255.0
++                ).unsqueeze(0)
++
++                preds = model.multi_inference(
++                    img0,
++                    img1,
++                    TTA=True,
++                    time_list=[(i + 1) * (1.0 / NX) for i in range(NX - 1)],
++                    fast_TTA=True,
++                )
++
++                iio.imwrite(out / cam_id / f"{i * NX:04d}.png", img0_np)
++
++                for j in range(1, NX):
++                    pred = preds[j - 1].detach().cpu().numpy() * 255
++                    iio.imwrite(
++                        out / cam_id / f"{i * NX + j:04d}.png",
++                        (pred.transpose(1, 2, 0)).astype(np.uint8),
++                    )
++
++                iio.imwrite(out / cam_id / f"{i * NX + NX:04d}.png", img1_np)
+-- 
+2.45.1
+
