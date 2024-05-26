@@ -1,9 +1,12 @@
 [submodule "4dgs-wu/4dgs-wu"]
 	path = 4dgs-wu/4dgs-wu
 	url = https://github.com/hustvl/4DGaussians
+	ignore = dirty
 [submodule "4dgs-yang/4dgs-yang"]
 	path = 4dgs-yang/4dgs-yang
 	url = https://github.com/fudan-zvg/4d-gaussian-splatting.git
+	ignore = dirty
 [submodule "ema-vfi/ema-vfi"]
 	path = ema-vfi/ema-vfi
 	url = https://github.com/mcg-nju/ema-vfi
+	ignore = dirty

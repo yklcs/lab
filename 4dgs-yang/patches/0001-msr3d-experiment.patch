@@ -1,15 +1,3 @@
-From 991f7b2134df8543ca632d93119d0b90838e3d31 Mon Sep 17 00:00:00 2001
-From: Lucas Yunkyu Lee <lucas@yklcs.com>
-Date: Sun, 26 May 2024 19:46:45 +0900
-Subject: [PATCH] msr3d experiment
-
----
- configs/msr3d-ballet.yaml | 59 +++++++++++++++++++++++++++++++++++++++
- scene/__init__.py         |  3 +-
- scripts/n3v2blender.py    |  4 +--
- 3 files changed, 63 insertions(+), 3 deletions(-)
- create mode 100644 configs/msr3d-ballet.yaml
-
 diff --git a/configs/msr3d-ballet.yaml b/configs/msr3d-ballet.yaml
 new file mode 100644
 index 0000000..1cdd131
@@ -111,6 +99,3 @@ index c3d0446..c010a62 100644
                  pose = np.array(frame['transform_matrix']) @ blender2opencv
                  fname2pose.update({fname: pose})
                  
--- 
-2.45.1
-
