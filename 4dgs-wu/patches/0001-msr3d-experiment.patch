@@ -1,0 +1,73 @@
+From ec75437484ecdb6b54f4040654b886156f584a80 Mon Sep 17 00:00:00 2001
+From: Lucas Yunkyu Lee <lucas@yklcs.com>
+Date: Sun, 26 May 2024 19:50:18 +0900
+Subject: [PATCH] msr3d experiment
+
+---
+ arguments/multipleview/msr3d.py | 33 +++++++++++++++++++++++++++++++++
+ render.py                       |  4 ++--
+ 2 files changed, 35 insertions(+), 2 deletions(-)
+ create mode 100644 arguments/multipleview/msr3d.py
+
+diff --git a/arguments/multipleview/msr3d.py b/arguments/multipleview/msr3d.py
+new file mode 100644
+index 0000000..b0a9ccf
+--- /dev/null
++++ b/arguments/multipleview/msr3d.py
+@@ -0,0 +1,33 @@
++ModelHiddenParams = dict(
++    kplanes_config = {
++     'grid_dimensions': 2,
++     'input_coordinate_dim': 4,
++     'output_coordinate_dim': 16,
++     'resolution': [64, 64, 64, 150]
++    },
++    multires = [1,2],
++    defor_depth = 0,
++    net_width = 128,
++    plane_tv_weight = 0.0002,
++    time_smoothness_weight = 0.001,
++    l1_time_planes =  0.0001,
++    no_do=False,
++    no_dshs=False,
++    no_ds=False,
++    empty_voxel=False,
++    render_process=False,
++    static_mlp=False
++
++)
++OptimizationParams = dict(
++    dataloader=True,
++    iterations = 30000,
++    batch_size=4,
++    coarse_iterations = 6000,
++    densify_until_iter = 15_000,
++    # opacity_reset_interval = 60000,
++    opacity_threshold_coarse = 0.005,
++    opacity_threshold_fine_init = 0.005,
++    opacity_threshold_fine_after = 0.005,
++    # pruning_interval = 2000
++)
+diff --git a/render.py b/render.py
+index 45c7da8..8a00465 100644
+--- a/render.py
++++ b/render.py
+@@ -83,7 +83,7 @@ def render_set(model_path, name, iteration, views, gaussians, pipeline, backgrou
+     multithread_write(render_list, render_path)
+ 
+     
+-    imageio.mimwrite(os.path.join(model_path, name, "ours_{}".format(iteration), 'video_rgb.mp4'), render_images, fps=30)
++    imageio.mimwrite(os.path.join(model_path, name, "ours_{}".format(iteration), 'video_rgb.mp4'), render_images, fps=45)
+ def render_sets(dataset : ModelParams, hyperparam, iteration : int, pipeline : PipelineParams, skip_train : bool, skip_test : bool, skip_video: bool):
+     with torch.no_grad():
+         gaussians = GaussianModel(dataset.sh_degree, hyperparam)
+@@ -121,4 +121,4 @@ if __name__ == "__main__":
+     # Initialize system state (RNG)
+     safe_state(args.quiet)
+ 
+-    render_sets(model.extract(args), hyperparam.extract(args), args.iteration, pipeline.extract(args), args.skip_train, args.skip_test, args.skip_video)
+\ No newline at end of file
++    render_sets(model.extract(args), hyperparam.extract(args), args.iteration, pipeline.extract(args), args.skip_train, args.skip_test, args.skip_video)
+-- 
+2.45.1
+
