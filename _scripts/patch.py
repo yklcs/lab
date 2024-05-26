@@ -18,9 +18,9 @@ def sh(cmd, *args, **kwargs):
     return subprocess.run(cmd, *args, **kwargs)
 
 
-def diff(submodule: Pathish, patch: Pathish):
+def diff(submodule: Pathish, patch: Pathish | None):
     submodule = Path(submodule).resolve()
-    patch = Path(patch).resolve()
+    patch = Path(patch).resolve() if patch is not None else None
 
     git = ["git", "--no-pager", "-C", submodule]
 
@@ -33,7 +33,8 @@ def diff(submodule: Pathish, patch: Pathish):
         raise Exception("not in git submodule")
 
     sh([*git, "add", "-N", "-A"])
-    sh([*git, "diff", "origin/HEAD", "--output", patch])
+    output = ["--output", patch] if patch is not None else []
+    sh([*git, "diff", "HEAD", *output])
 
 
 def apply(submodule: Pathish, patch: Pathish, *, dry_run=False):
@@ -42,11 +43,11 @@ def apply(submodule: Pathish, patch: Pathish, *, dry_run=False):
 
     git = ["git", "--no-pager", "-C", submodule]
 
-    args = []
     if dry_run:
-        args.append("--summary")
-
-    sh([*git, "apply", *args, patch])
+        sh([*git, "apply", "--summary", patch])
+    else:
+        sh([*git, "reset", "--hard", "HEAD"])
+        sh([*git, "apply", patch])
 
 
 if __name__ == "__main__":
@@ -54,13 +55,13 @@ if __name__ == "__main__":
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     diff_parser = subparsers.add_parser("diff")
-    diff_parser.add_argument("submodule", type=Path)
-    diff_parser.add_argument("patch", type=Path)
+    diff_parser.add_argument("submodule", type=str)
+    diff_parser.add_argument("patch", type=str, nargs="?")
 
     apply_parser = subparsers.add_parser("apply")
     apply_parser.add_argument("-C", "--dry-run", "--check", action="store_true")
-    apply_parser.add_argument("submodule", type=Path)
-    apply_parser.add_argument("patch", type=Path)
+    apply_parser.add_argument("submodule", type=str)
+    apply_parser.add_argument("patch", type=str)
 
     args = parser.parse_args()
 
