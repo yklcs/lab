@@ -4,3 +4,6 @@
 [submodule "4dgs-yang/4dgs-yang"]
 	path = 4dgs-yang/4dgs-yang
 	url = https://github.com/fudan-zvg/4d-gaussian-splatting.git
+[submodule "ema-vfi/ema-vfi"]
+	path = ema-vfi/ema-vfi
+	url = https://github.com/mcg-nju/ema-vfi
